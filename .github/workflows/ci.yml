@@ -1,4 +1,4 @@
-name: CI-CD using Artifacts
+name: CI-CD with Real Code
 
 on:
   push:
@@ -6,44 +6,52 @@ on:
       - main
 
 jobs:
-  build:
-    name: Build Job
+  ci:
+    name: CI (Build & Test)
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Create build artifact
-        run: |
-          mkdir build
-          echo "Build successful at $(date)" > build/output.txt
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
 
-      - name: Upload artifact
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run tests
+        run: npm test
+
+      - name: Build application
+        run: npm run build
+
+      - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: app-build
-          path: build/
+          name: prod-build
+          path: dist/
 
-  deploy:
-    name: Deploy Job
+  cd:
+    name: CD (Deploy Artifact)
     runs-on: ubuntu-latest
-    needs: build
+    needs: ci
 
     steps:
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
-          name: app-build
+          name: prod-build
 
       - name: Verify artifact
         run: |
           ls -R
           cat output.txt
 
-      - name: Simulate deployment
+      - name: Simulate production deployment
         run: |
-          mkdir -p /tmp/deploy
-          cp output.txt /tmp/deploy/
-          echo "Deployed successfully 🚀"
-
+          mkdir -p /opt/app
+          cp output.txt /opt/app/
+          echo "🚀 Application deployed"
