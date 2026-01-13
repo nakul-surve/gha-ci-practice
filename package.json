@@ -2,6 +2,6 @@
   "name": "gha-ci-practice",
   "version": "1.0.0",
   "scripts": {
-    "test": "echo 'Tests passed ✅'"
+    "test": "exit 1"
   }
 }
