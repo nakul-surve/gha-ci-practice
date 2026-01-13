@@ -1,7 +1,9 @@
 {
-  "name": "gha-ci-practice",
+  "name": "gha-ci-cd-demo",
   "version": "1.0.0",
   "scripts": {
-    "test": "Tests passed"
+    "test": "node test.js",
+    "build": "mkdir -p dist && node app.js > dist/output.txt"
   }
 }
+
