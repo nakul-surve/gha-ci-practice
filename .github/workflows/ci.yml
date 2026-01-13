@@ -6,20 +6,27 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Create build output
         run: |
           mkdir build
-          echo "This is my CI build artifact" > build/output.txt
+          echo "Artifact from build job" > build/output.txt
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
-          name: my-build-artifact
+          name: build-files
           path: build/
 
-      
+  test-artifact:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: build-files
+
+      - name: Verify artifact
+        run: cat build/output.txt
