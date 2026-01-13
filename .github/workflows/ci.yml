@@ -1,33 +1,49 @@
-name: CI Pipeline
+name: CI-CD using Artifacts
 
 on:
   push:
+    branches:
+      - main
 
 jobs:
   build:
+    name: Build Job
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
 
-      - name: Create build output
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create build artifact
         run: |
           mkdir build
-          echo "Artifact from build job" > build/output.txt
+          echo "Build successful at $(date)" > build/output.txt
 
-      - uses: actions/upload-artifact@v4
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
         with:
-          name: build-files
+          name: app-build
           path: build/
 
-  test-artifact:
-    needs: build
+  deploy:
+    name: Deploy Job
     runs-on: ubuntu-latest
+    needs: build
+
     steps:
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
-          name: build-files
-          path: build  
-          
+          name: app-build
+
       - name: Verify artifact
-        run: cat build/output.txt
+        run: |
+          ls -R
+          cat output.txt
+
+      - name: Simulate deployment
+        run: |
+          mkdir -p /tmp/deploy
+          cp output.txt /tmp/deploy/
+          echo "Deployed successfully 🚀"
+
